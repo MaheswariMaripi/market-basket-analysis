@@ -14,6 +14,7 @@ then open http://127.0.0.1:5000 in your browser.
 import os
 import sys
 
+import pandas as pd
 from flask import Flask, jsonify, render_template, request, send_from_directory
 
 # Make sure the project root is importable regardless of where the app is
@@ -22,7 +23,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from src import PLOTS_DIR
+from src import PLOTS_DIR, RESULTS_DIR
 from src.association_rules import filter_rules
 from src.recommendation import (ensure_rules, get_all_products,
                                 get_top_product_combinations, recommend)
@@ -40,6 +41,35 @@ app.logger.info("Loaded %d association rules for %d products.",
                 len(RULES), len(PRODUCTS))
 
 
+def build_aisles():
+    """Group products into storefront 'aisles' using the learned segments.
+
+    Falls back to a single flat list when the segmentation has not been
+    computed yet (e.g. before ``python main.py`` has been run).
+    """
+    clusters = {}
+    clusters_csv = RESULTS_DIR / "product_clusters.csv"
+    if clusters_csv.exists():
+        df = pd.read_csv(clusters_csv)
+        for row in df.itertuples():
+            clusters.setdefault(int(row.cluster), []).append(row.product)
+
+    assigned = {p for items in clusters.values() for p in items}
+    leftover = [p for p in PRODUCTS if p not in assigned]
+    if leftover:
+        clusters.setdefault(-1, []).extend(leftover)
+
+    aisles = []
+    for cluster_id in sorted(clusters):
+        name = "Other products" if cluster_id == -1 else f"Aisle {cluster_id + 1}"
+        aisles.append({"id": cluster_id, "name": name,
+                       "products": sorted(clusters[cluster_id])})
+    return aisles
+
+
+AISLES = build_aisles()
+
+
 # ----------------------------------------------------------------------
 # Pages
 # ----------------------------------------------------------------------
@@ -47,6 +77,8 @@ app.logger.info("Loaded %d association rules for %d products.",
 def index():
     return render_template("index.html",
                            products=PRODUCTS,
+                           aisles=AISLES,
+                           rules_count=len(RULES),
                            top_combinations=TOP_COMBINATIONS)
 
 

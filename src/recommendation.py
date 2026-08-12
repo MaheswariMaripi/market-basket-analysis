@@ -12,11 +12,11 @@ Responsibilities
 
 Recommendation logic
 --------------------
-For a basket ``{bread, milk}`` we look for every rule
-``{bread} -> X`` or ``{milk} -> X`` where the rule's antecedent is a subset
-of the basket and its consequent is *not* already in the basket. Each such
-consequent is a candidate recommendation, and we keep the strongest rule
-(best lift, then best confidence) that produced it.
+For a basket ``{bread, milk}`` we look for every rule whose antecedent
+overlaps the basket. Rules whose antecedent is **fully** covered by the
+basket rank above partial matches, and within the same overlap level the
+strongest rule (best lift, then best confidence) wins. Each consequent
+that is not already in the basket is a candidate recommendation.
 """
 
 import os
@@ -92,26 +92,43 @@ def recommend(selected_products, rules, top_n=5):
     if not selected:
         return []
 
-    # Sort by lift first, then confidence, so the first hit per product is
-    # the strongest rule for that product.
-    ranked = rules.sort_values(["lift", "confidence"], ascending=False)
+    def _coverage(antecedents):
+        """Fraction of the antecedent covered by the basket (0..1)."""
+        overlap = antecedents & selected
+        return len(overlap) / len(antecedents) if antecedents else 0.0
 
-    recommendations = {}
-    for rule in ranked.itertuples():
+    # Score every rule that shares at least one product with the basket.
+    # Full antecedent matches sort first, then partial matches by lift.
+    candidates = []
+    for rule in rules.itertuples():
         antecedents = {str(a).strip().lower() for a in rule.antecedents}
         consequents = {str(c).strip().lower() for c in rule.consequents}
 
-        if not antecedents or not antecedents.issubset(selected):
+        if not (antecedents & selected):
             continue
 
+        candidates.append((
+            _coverage(antecedents),
+            float(rule.lift),
+            float(rule.confidence),
+            rule,
+            antecedents,
+            consequents,
+        ))
+
+    candidates.sort(key=lambda entry: (entry[0], entry[1], entry[2]),
+                    reverse=True)
+
+    recommendations = {}
+    for _coverage_score, lift, confidence, rule, antecedents, consequents in candidates:
         new_products = consequents - selected
         for product in new_products:
             if product in recommendations:
                 continue
             recommendations[product] = {
                 "product": product,
-                "confidence": round(float(rule.confidence), 3),
-                "lift": round(float(rule.lift), 2),
+                "confidence": round(float(confidence), 3),
+                "lift": round(float(lift), 2),
                 "rule": ", ".join(sorted(antecedents)),
             }
             if len(recommendations) >= top_n:

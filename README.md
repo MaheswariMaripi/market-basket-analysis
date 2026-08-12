@@ -27,8 +27,10 @@ raw data ──► cleaning ──► EDA ──► Apriori ──► rules ─�
   consequents with their rule metrics.
 - **Product clustering** — K-means segments products by their co-occurrence
   patterns; the "right" number of segments is chosen via the silhouette score.
-- **Flask web app** — interactive basket builder, live recommendations, a rule
-  explorer with searchable / filterable table, and the generated plots.
+- **Flask web app** — modern dashboard with a storefront layout (products
+  grouped into data-driven aisles), a shopping-basket flow with live
+  recommendations, a searchable rule explorer, light/dark themes, and the
+  generated plots.
 - **Automated tests** — pytest suite covering every module.
 
 ## Requirements

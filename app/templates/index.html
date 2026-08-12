@@ -1,92 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Basket Analysis</title>
+    <title>Basket Insight - Market Basket Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Market Basket Analysis</h1>
-            <p class="tagline">Discover product combinations using Apriori association rule mining.</p>
+<div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-icon">🛒</span>
+            <div>
+                <h1>Basket Insight</h1>
+                <p>Market Basket Analysis</p>
+            </div>
         </div>
-    </header>
 
-    <main class="container">
+        <nav class="nav">
+            <button class="nav-btn active" data-view="shop">🏪 Storefront</button>
+            <button class="nav-btn" data-view="basket">🧺 My Basket <span id="basket-count" class="badge" hidden>0</span></button>
+            <button class="nav-btn" data-view="explorer">🔍 Rule Explorer</button>
+            <button class="nav-btn" data-view="plots">📊 Plots</button>
+        </nav>
 
-        <!-- Recommendation panel -->
-        <section class="card" id="recommendation-card">
-            <h2>What's in your basket?</h2>
-            <p class="hint">Select the products you are buying and we will suggest what customers usually buy together.</p>
+        <div class="sidebar-footer">
+            <button id="theme-toggle" class="theme-btn" title="Toggle theme">🌙</button>
+            <p class="stats-line" id="stats-line">{{ products | length }} products · {{ rules_count }} rules</p>
+        </div>
+    </aside>
 
-            <div class="selector">
-                <input type="text" id="product-search" class="search-input"
-                       placeholder="Search products..." autocomplete="off">
-                <select id="product-select" multiple size="8">
-                    {% for product in products %}
-                    <option value="{{ product }}">{{ product }}</option>
-                    {% endfor %}
-                </select>
-                <div class="selector-actions">
-                    <button id="add-product" class="btn btn-secondary">+ Add to basket</button>
-                    <button id="clear-basket" class="btn btn-ghost">Clear</button>
+    <!-- Main content -->
+    <main class="content">
+
+        <!-- ============ STOREFRONT ============ -->
+        <section id="view-shop" class="view active">
+            <header class="view-header">
+                <h2>Storefront</h2>
+                <p class="sub">Click products to add them to your basket. The store is grouped into data-driven aisles learned from real purchase patterns.</p>
+                <input type="text" id="product-search" class="search-input" placeholder="🔎 Search products..." autocomplete="off">
+            </header>
+
+            <div id="aisles"></div>
+        </section>
+
+        <!-- ============ BASKET ============ -->
+        <section id="view-basket" class="view">
+            <header class="view-header">
+                <h2>My Basket</h2>
+                <p class="sub">Add a few products, then get instant recommendations mined from 7,501 real baskets.</p>
+            </header>
+
+            <div class="basket-summary">
+                <div id="basket-list" class="basket-list">
+                    <p class="empty-state" id="basket-empty">Your basket is empty. Add products from the <a href="#" data-goto="shop">Storefront</a>.</p>
+                </div>
+                <button id="recommend-btn" class="btn btn-primary" disabled>✨ Get Recommendations</button>
+                <button id="clear-basket" class="btn btn-ghost">Clear basket</button>
+            </div>
+
+            <div id="recommendations" class="rec-section">
+                <h3>Recommended for you</h3>
+                <p class="sub">Based on which products customers who shopped like you also bought.</p>
+                <div id="results" class="rec-grid">
+                    <p class="empty-state">Your recommendations will appear here.</p>
                 </div>
             </div>
 
-            <div id="basket" class="basket">
-                <span class="basket-placeholder">No products added yet.</span>
+            <div id="top-combos" class="rec-section">
+                <h3>Strongest product combinations</h3>
+                <p class="sub">The 10 most reliable rules in the data, ranked by lift.</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>If customer buys</th>
+                            <th>Then also buys</th>
+                            <th>Support</th>
+                            <th>Confidence</th>
+                            <th>Lift</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for combo in top_combinations %}
+                        <tr>
+                            <td>{{ combo.antecedents | join(', ') }}</td>
+                            <td>{{ combo.consequents | join(', ') }}</td>
+                            <td>{{ combo.support }}</td>
+                            <td>{{ (combo.confidence * 100) | round | int }}%</td>
+                            <td>{{ combo.lift }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
-            <button id="recommend-btn" class="btn btn-primary">Recommend Products</button>
         </section>
 
-        <!-- Results panel -->
-        <section class="card" id="results-card">
-            <h2>Recommended Products</h2>
-            <div id="results" class="results">
-                <p class="results-placeholder">Recommendations will appear here.</p>
-            </div>
-        </section>
-
-        <!-- Top combinations panel -->
-        <section class="card" id="combinations-card">
-            <h2>Strongest Product Combinations</h2>
-            <p class="hint">Top 10 rules ranked by lift from the mined data.</p>
-            <table class="combinations-table">
-                <thead>
-                    <tr>
-                        <th>If customer buys</th>
-                        <th>Then also buys</th>
-                        <th>Support</th>
-                        <th>Confidence</th>
-                        <th>Lift</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for combo in top_combinations %}
-                    <tr>
-                        <td>{{ combo.antecedents | join(', ') }}</td>
-                        <td>{{ combo.consequents | join(', ') }}</td>
-                        <td>{{ combo.support }}</td>
-                        <td>{{ combo.confidence }}</td>
-                        <td>{{ combo.lift }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Rule explorer panel -->
-        <section class="card" id="rules-card">
-            <h2>Rule Explorer</h2>
-            <p class="hint">Search the mined rules, filter by confidence and lift, and watch them live on the scatter plot.</p>
+        <!-- ============ RULE EXPLORER ============ -->
+        <section id="view-explorer" class="view">
+            <header class="view-header">
+                <h2>Rule Explorer</h2>
+                <p class="sub">Search the mined rules and filter by confidence and lift.</p>
+            </header>
 
             <div class="explorer-filters">
-                <input type="text" id="rule-search" class="search-input"
-                       placeholder="Filter by product..." autocomplete="off">
+                <input type="text" id="rule-search" class="search-input" placeholder="Filter by product..." autocomplete="off">
                 <label>Min confidence
                     <input type="number" id="rule-min-conf" min="0" max="1" step="0.05" value="0">
                 </label>
@@ -105,26 +125,32 @@
 
             <div class="explorer-grid">
                 <div id="rule-scatter" class="scatter"></div>
-                <table class="combinations-table rules-table">
-                    <thead>
-                        <tr>
-                            <th>If customer buys</th>
-                            <th>Then also buys</th>
-                            <th>Conf.</th>
-                            <th>Lift</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rules-tbody">
-                        <tr><td colspan="4" class="empty-cell">Loading rules...</td></tr>
-                    </tbody>
-                </table>
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>If customer buys</th>
+                                <th>Then also buys</th>
+                                <th>Conf.</th>
+                                <th>Lift</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rules-tbody">
+                            <tr><td colspan="4" class="empty-cell">Loading rules...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <p id="rules-count" class="hint"></p>
+            <p id="rules-count" class="sub"></p>
         </section>
 
-        <!-- Plot gallery -->
-        <section class="card" id="plots-card">
-            <h2>Exploratory Analysis</h2>
+        <!-- ============ PLOTS ============ -->
+        <section id="view-plots" class="view">
+            <header class="view-header">
+                <h2>Exploratory Analysis</h2>
+                <p class="sub">The visual story behind the data: what sells most, typical basket sizes, and the product segments.</p>
+            </header>
+
             <div class="plot-gallery">
                 <figure>
                     <img src="/plots/top_items.png" alt="Top items">
@@ -149,12 +175,15 @@
             </div>
         </section>
 
-        <footer class="footer">
-            <p>Built with Flask, Pandas, mlxtend and the Market Basket Optimisation dataset.</p>
-        </footer>
-
     </main>
+</div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+    // Product catalogue + aisles, injected from the server.
+    window.AISLES = {{ aisles | tojson }};
+</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
