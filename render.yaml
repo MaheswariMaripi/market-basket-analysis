@@ -1,0 +1,11 @@
+# Render blueprint - deploys this repo as a free web service.
+# To use: on render.com click "New" -> "Blueprint" and select this repo.
+services:
+  - type: web
+    name: market-basket-analysis
+    runtime: python
+    plan: free
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m waitress --port=$PORT --host=0.0.0.0 app.app:app
+    healthCheckPath: /
