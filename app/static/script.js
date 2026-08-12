@@ -10,48 +10,72 @@ const AISLES = window.AISLES || [];
 // ---- Product emoji lookup -----------------------------------------
 const EMOJI_RULES = [
     [/\bmilk\b/, "🥛"], [/\bmineral water\b/, "💧"], [/\bwater\b/, "💧"],
-    [/\bjuice\b/, "🧃"], [/\bsoda\b/, "🥤"], [/\bcola\b/, "🥤"],
-    [/\bcoffee\b/, "☕"], [/\btea\b/, "🍵"], [/\benergy drink\b/, "⚡"],
-    [/\bbeer\b/, "🍺"], [/\bwine\b/, "🍷"],
+    [/\bsmoothie\b/, "🥤"], [/\bjuice\b/, "🧃"], [/\bsoda\b/, "🥤"],
+    [/\bcola\b/, "🥤"], [/\bcoffee\b/, "☕"], [/\btea\b/, "🍵"],
+    [/\benergy drink\b/, "⚡"], [/\bbeer\b/, "🍺"], [/\bwine\b/, "🍷"],
+    [/\bcider\b/, "🍺"], [/\bchampagne\b/, "🥂"],
     [/\bchocolate\b/, "🍫"], [/\bcandy\b/, "🍬"], [/\bgummy\b/, "🍬"],
-    [/\bcookie\b/, "🍪"], [/\bbiscuit\b/, "🍪"], [/\bcrackers\b/, "🍘"],
-    [/\bcakes\b/, "🍰"], [/\bcake\b/, "🍰"], [/\bcroissant\b/, "🥐"],
-    [/\bbread\b/, "🍞"], [/\bbaguette\b/, "🥖"],
-    [/\bcereals\b/, "🥣"], [/\brice\b/, "🍚"],
-    [/\bspaghetti\b/, "🍝"], [/\bpasta\b/, "🍝"], [/\bnoodles\b/, "🍜"],
-    [/\bflour\b/, "🌾"],
-    [/\beggs\b/, "🥚"], [/\bbutter\b/, "🧈"], [/\bcheese\b/, "🧀"],
-    [/\bfromage\b/, "🧀"], [/\byogurt\b/, "🥛"], [/\bcream\b/, "🍨"],
+    [/\bgum\b/, "🍬"], [/\bcookie\b/, "🍪"], [/\bbiscuit\b/, "🍪"],
+    [/\bcrackers\b/, "🍘"], [/\bcakes\b/, "🍰"], [/\bcake\b/, "🍰"],
+    [/\bcroissant\b/, "🥐"], [/\bmuffin\b/, "🧁"], [/\bbrownie\b/, "🍫"],
+    [/\bpancake\b/, "🥞"], [/\bcereals\b/, "🥣"], [/\boatmeal\b/, "🥣"],
+    [/\bbread\b/, "🍞"], [/\bbaguette\b/, "🥖"], [/\bsandwich\b/, "🥪"],
+    [/\brice\b/, "🍚"], [/\bspaghetti\b/, "🍝"], [/\bpasta\b/, "🍝"],
+    [/\bnoodles\b/, "🍜"], [/\bflour\b/, "🌾"], [/\bseed\b/, "🌱"],
+    [/\begg\b/, "🥚"], [/\bbutter\b/, "🧈"], [/\bcheese\b/, "🧀"],
+    [/\bfromage\b/, "🧀"], [/\byogurt\b/, "🥛"], [/\bcream\b/, "🥛"],
     [/\bground beef\b/, "🥩"], [/\bmeat\b/, "🥩"], [/\bbeef\b/, "🥩"],
-    [/\bsteak\b/, "🥩"], [/\bchicken\b/, "🍗"], [/\bturkey\b/, "🦃"],
-    [/\bpork\b/, "🥓"], [/\bbacon\b/, "🥓"], [/\bham\b/, "🍖"],
-    [/\bburger\b/, "🍔"], [/\bsausage\b/, "🌭"], [/\bescalope\b/, "🍖"],
-    [/\bfish\b/, "🐟"], [/\bshrimp\b/, "🦐"], [/\btuna\b/, "🐟"],
-    [/\bsalmon\b/, "🐟"],
+    [/\bsteak\b/, "🥩"], [/\bmeatball\b/, "🍖"], [/\bchicken\b/, "🍗"],
+    [/\bturkey\b/, "🦃"], [/\bpork\b/, "🥓"], [/\bbacon\b/, "🥓"],
+    [/\bham\b/, "🍖"], [/\bburger\b/, "🍔"], [/\bsausage\b/, "🌭"],
+    [/\bhot dog\b/, "🌭"], [/\bescalope\b/, "🍖"], [/\bfish\b/, "🐟"],
+    [/\bshrimp\b/, "🦐"], [/\btuna\b/, "🐟"], [/\bsalmon\b/, "🐟"],
     [/\bfrench fries\b/, "🍟"], [/\bpotato\b/, "🥔"], [/\bchips\b/, "🥔"],
-    [/\btomato\b/, "🍅"], [/\bonion\b/, "🧅"], [/\bgarlic\b/, "🧄"],
-    [/\bcucumber\b/, "🥒"], [/\bpepper\b/, "🫑"], [/\bmushroom\b/, "🍄"],
-    [/\bcarrot\b/, "🥕"], [/\bcorn\b/, "🌽"], [/\bavocado\b/, "🥑"],
-    [/\bbroccoli\b/, "🥦"], [/\bcabbage\b/, "🥬"], [/\bsalad\b/, "🥗"],
-    [/\bvegetables\b/, "🥦"], [/\bspinach\b/, "🥬"],
+    [/\byam\b/, "🍠"], [/\btomato sauce\b/, "🍝"], [/\btomato\b/, "🍅"],
+    [/\bketchup\b/, "🥫"], [/\bchutney\b/, "🥫"], [/\bonion\b/, "🧅"],
+    [/\bshallot\b/, "🧅"], [/\bgarlic\b/, "🧄"], [/\bcucumber\b/, "🥒"],
+    [/\bzucchini\b/, "🥒"], [/\bpickle\b/, "🥒"], [/\bpepper\b/, "🫑"],
+    [/\bchili\b/, "🌶️"], [/\bmushroom\b/, "🍄"], [/\bcarrot\b/, "🥕"],
+    [/\bcorn\b/, "🌽"], [/\bavocado\b/, "🥑"], [/\bgreen beans\b/, "🫛"],
+    [/\bbroccoli\b/, "🥦"], [/\bcauliflower\b/, "🥦"], [/\bcabbage\b/, "🥬"],
+    [/\basparagus\b/, "🥦"], [/\bgreen tea\b/, "🍵"], [/\bspinach\b/, "🥬"],
+    [/\bsalad\b/, "🥗"], [/\bvegetables\b/, "🥦"], [/\beggplant\b/, "🍆"],
     [/\bapple\b/, "🍎"], [/\bbanana\b/, "🍌"], [/\borange\b/, "🍊"],
-    [/\blemon\b/, "🍋"], [/\bberry\b/, "🫐"], [/\bstrawberr\b/, "🍓"],
-    [/\bgrapes\b/, "🍇"], [/\bwatermelon\b/, "🍉"], [/\bpeach\b/, "🍑"],
-    [/\bpear\b/, "🍐"], [/\bpineapple\b/, "🍍"], [/\bfruit\b/, "🍎"],
-    [/\bolive oil\b/, "🫒"], [/\bolives\b/, "🫒"],
-    [/\bhoney\b/, "🍯"], [/\bjam\b/, "🍓"], [/\bsugar\b/, "🍬"],
-    [/\bsoup\b/, "🍲"], [/\bsauce\b/, "🥫"], [/\btomato sauce\b/, "🍝"],
-    [/\bherb\b/, "🌿"], [/\bspices\b/, "🧂"], [/\bsalt\b/, "🧂"],
-    [/\bice cream\b/, "🍨"], [/\bfrozen\b/, "🧊"],
+    [/\blemon\b/, "🍋"], [/\bbanana\b/, "🍌"], [/\bstrawberry\b/, "🍓"],
+    [/\bbramble\b/, "🫐"], [/\bblueberry\b/, "🫐"], [/\bgrapes\b/, "🍇"],
+    [/\bwatermelon\b/, "🍉"], [/\bpeach\b/, "🍑"], [/\bpear\b/, "🍐"],
+    [/\bpineapple\b/, "🍍"], [/\bmelon\b/, "🍈"], [/\bfruit\b/, "🍎"],
+    [/\balmond\b/, "🌰"], [/\bolive oil\b/, "🫒"], [/\bolives\b/, "🫒"],
+    [/\boil\b/, "🫒"], [/\bhoney\b/, "🍯"], [/\bjam\b/, "🍓"],
+    [/\bsugar\b/, "🍬"], [/\bsoup\b/, "🍲"], [/\bsauce\b/, "🥫"],
+    [/\bmayonnaise\b/, "🫙"], [/\bmayo\b/, "🫙"], [/\bherb\b/, "🌿"],
+    [/\bmint\b/, "🌿"], [/\bspices\b/, "🧂"], [/\bsalt\b/, "🧂"],
+    [/\bice cream\b/, "🍨"], [/\bfrozen\b/, "🧊"], [/\bbar\b/, "🍫"],
+    [/\bbabies\b/, "🍼"], [/\bbaby\b/, "🍼"], [/\bpet food\b/, "🐾"],
     [/\bnapkins\b/, "🧻"], [/\bshampoo\b/, "🧴"], [/\bsoap\b/, "🧼"],
-    [/\bdetergent\b/, "🧺"], [/\btoilet\b/, "🚽"], [/\bvitamins\b/, "💊"],
+    [/\bdetergent\b/, "🧺"], [/\btoothpaste\b/, "🪥"], [/\bbody spray\b/, "🧴"],
+    [/\bbug spray\b/, "🦟"], [/\bclothes\b/, "👕"], [/\btoilet\b/, "🚽"],
+    [/\bmagazine\b/, "📰"], [/\bvitamins\b/, "💊"],
     [/\bdishes\b/, "🍽️"], [/\bkitchen\b/, "🍽️"],
 ];
+
+// Product names in the data are usually plural ("tomatoes"), but the
+// rules above are written in the singular. Try a few common plural
+// forms before giving up on the basket fallback.
+function emojiVariants(name) {
+    const variants = [name];
+    if (name.endsWith("ies")) variants.push(name.slice(0, -3) + "y");
+    if (name.endsWith("es")) variants.push(name.slice(0, -2));
+    if (name.endsWith("s")) variants.push(name.slice(0, -1));
+    return variants;
+}
 
 function emojiFor(product) {
     const name = product.toLowerCase();
     for (const [re, emoji] of EMOJI_RULES) {
-        if (re.test(name)) return emoji;
+        for (const variant of emojiVariants(name)) {
+            if (re.test(variant)) return emoji;
+        }
     }
     return "🛒";
 }
@@ -122,7 +146,7 @@ function renderStorefront(filter) {
         const section = document.createElement("div");
         section.className = "aisle";
         section.innerHTML =
-            '<h3>' + emojiFor(aisle.name) + " " + escapeHtml(aisle.name) +
+            '<h3>🛍️ ' + escapeHtml(aisle.name) +
             ' <span class="aisle-count">' + aisle.products.length + " products</span></h3>";
 
         const grid = document.createElement("div");
