@@ -1,5 +1,5 @@
 """
-Generate the four Jupyter notebooks for the project.
+Generate the five Jupyter notebooks for the project.
 
 This is a helper script: each notebook is written as JSON (nbformat v4)
 with clean, readable cells so the notebooks can also be edited by hand
@@ -268,6 +268,75 @@ def build_notebooks():
                 "\n"
                 "The same engine powers the Flask web app in `app/`. Run\n"
                 "`python app/app.py` to use it interactively in the browser."
+            ),
+        ],
+        # ------------------------------------------------------------------
+        "05_product_segmentation.ipynb": [
+            _markdown(
+                "# 05 - Product Segmentation\n"
+                "\n"
+                "Beyond association rules, we group products into data-driven\n"
+                "segments by clustering their *co-occurrence patterns* with K-means."
+            ),
+            _code(BOOTSTRAP),
+            _code(
+                "from src.preprocessing import preprocess_dataset\n"
+                "\n"
+                "raw, transactions, encoded = preprocess_dataset()\n"
+                "print(f'Transactions: {len(transactions):,}')\n"
+                "print(f'Unique products: {encoded.shape[1]:,}')"
+            ),
+            _markdown(
+                "### Co-occurrence matrix\n"
+                "\n"
+                "Every product is described by how often it is bought together with\n"
+                "every other product. `encoded.T @ encoded` gives those counts."
+            ),
+            _code(
+                "from src.clustering import co_occurrence_matrix\n"
+                "\n"
+                "cooc = co_occurrence_matrix(encoded)\n"
+                "cooc.iloc[:5, :5]"
+            ),
+            _markdown(
+                "### Run K-means clustering\n"
+                "\n"
+                "The number of clusters is chosen with the silhouette score.\n"
+                "Products with fewer than 5 baskets are skipped to reduce noise."
+            ),
+            _code(
+                "from src.clustering import cluster_products\n"
+                "\n"
+                "assignments, silhouette = cluster_products(encoded, min_frequency=5)\n"
+                "print(f'Clusters found: {assignments[\"cluster\"].nunique()}')\n"
+                "print(f'Silhouette score: {silhouette:.3f}')\n"
+                "assignments.head(15)"
+            ),
+            _code(
+                "from src.clustering import summarize_clusters\n"
+                "\n"
+                "summary = summarize_clusters(assignments)\n"
+                "for cluster_id, info in summary.items():\n"
+                "    print(f\"Segment {cluster_id + 1} ({info['size']} products, "
+                "{info['share']:.0%}):\")\n"
+                "    print('   ', ', '.join(info['top_products'][:6]))"
+            ),
+            _code(
+                "from src.clustering import run_clustering\n"
+                "\n"
+                "stats = run_clustering(encoded)\n"
+                "print('Plot saved to:', stats['paths']['clusters_plot'])"
+            ),
+            _markdown(
+                "## Interpretation\n"
+                "\n"
+                "* Products clustered together share purchase context: they tend to\n"
+                "  appear in the same baskets.\n"
+                "* The segments are learned from the data, so they can reveal\n"
+                "  categories a manual taxonomy would miss.\n"
+                "* Combine with the association rules for a complete picture:\n"
+                "  rules tell you *what goes together*, segments tell you *which\n"
+                "  products form families*."
             ),
         ],
     }

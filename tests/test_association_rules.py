@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from src.association_rules import (generate_rules, load_rules,
+from src.association_rules import (filter_rules, generate_rules, load_rules,
                                    mine_frequent_itemsets, save_results,
                                    top_rules)
 
@@ -68,3 +68,53 @@ def test_save_and_load_rules_roundtrip(tmp_path):
 def test_load_rules_missing_file(tmp_path):
     with pytest.raises(FileNotFoundError):
         load_rules(tmp_path / "does_not_exist.csv")
+
+
+def _sample_rules():
+    return pd.DataFrame(
+        [
+            {
+                "antecedents": frozenset({"milk", "bread"}),
+                "consequents": frozenset({"butter"}),
+                "support": 0.05,
+                "confidence": 0.60,
+                "lift": 2.5,
+            },
+            {
+                "antecedents": frozenset({"milk"}),
+                "consequents": frozenset({"cereal"}),
+                "support": 0.03,
+                "confidence": 0.40,
+                "lift": 1.8,
+            },
+            {
+                "antecedents": frozenset({"soda"}),
+                "consequents": frozenset({"chips"}),
+                "support": 0.02,
+                "confidence": 0.90,
+                "lift": 3.0,
+            },
+        ]
+    )
+
+
+def test_filter_rules_by_product_substring():
+    rules = _sample_rules()
+    assert len(filter_rules(rules, product="milk")) == 2
+    assert len(filter_rules(rules, product="soda")) == 1
+    assert filter_rules(rules, product="nope").empty
+
+
+def test_filter_rules_by_metrics_and_sort():
+    rules = _sample_rules()
+    filtered = filter_rules(rules, min_confidence=0.5, min_lift=2.0)
+    assert set(filtered["lift"]) == {2.5, 3.0}
+
+    by_conf = filter_rules(rules, sort_by="confidence", ascending=False, limit=1)
+    assert by_conf.iloc[0]["confidence"] == 0.90
+
+
+def test_filter_rules_limit_and_empty_product():
+    rules = _sample_rules()
+    assert len(filter_rules(rules, limit=2)) == 2
+    assert len(filter_rules(rules, product="  ")) == len(rules)
