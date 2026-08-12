@@ -78,6 +78,7 @@ def index():
     return render_template("index.html",
                            products=PRODUCTS,
                            aisles=AISLES,
+                           catalog_size=sum(len(a["products"]) for a in AISLES),
                            rules_count=len(RULES),
                            top_combinations=TOP_COMBINATIONS)
 
