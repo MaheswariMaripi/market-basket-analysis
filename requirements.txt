@@ -1,0 +1,21 @@
+# Core data science stack
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.9
+seaborn>=0.13
+
+# Association rule mining
+mlxtend>=0.23
+
+# Product segmentation (K-means, PCA, silhouette)
+scikit-learn>=1.3
+
+# Web application
+flask>=3.0
+
+# Notebooks
+jupyter>=1.0
+nbformat>=5.10
+
+# Testing
+pytest>=8.0

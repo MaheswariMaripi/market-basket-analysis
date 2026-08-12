@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Basket Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Market Basket Analysis</h1>
+            <p class="tagline">Discover product combinations using Apriori association rule mining.</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Recommendation panel -->
+        <section class="card" id="recommendation-card">
+            <h2>What's in your basket?</h2>
+            <p class="hint">Select the products you are buying and we will suggest what customers usually buy together.</p>
+
+            <div class="selector">
+                <input type="text" id="product-search" class="search-input"
+                       placeholder="Search products..." autocomplete="off">
+                <select id="product-select" multiple size="8">
+                    {% for product in products %}
+                    <option value="{{ product }}">{{ product }}</option>
+                    {% endfor %}
+                </select>
+                <div class="selector-actions">
+                    <button id="add-product" class="btn btn-secondary">+ Add to basket</button>
+                    <button id="clear-basket" class="btn btn-ghost">Clear</button>
+                </div>
+            </div>
+
+            <div id="basket" class="basket">
+                <span class="basket-placeholder">No products added yet.</span>
+            </div>
+
+            <button id="recommend-btn" class="btn btn-primary">Recommend Products</button>
+        </section>
+
+        <!-- Results panel -->
+        <section class="card" id="results-card">
+            <h2>Recommended Products</h2>
+            <div id="results" class="results">
+                <p class="results-placeholder">Recommendations will appear here.</p>
+            </div>
+        </section>
+
+        <!-- Top combinations panel -->
+        <section class="card" id="combinations-card">
+            <h2>Strongest Product Combinations</h2>
+            <p class="hint">Top 10 rules ranked by lift from the mined data.</p>
+            <table class="combinations-table">
+                <thead>
+                    <tr>
+                        <th>If customer buys</th>
+                        <th>Then also buys</th>
+                        <th>Support</th>
+                        <th>Confidence</th>
+                        <th>Lift</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for combo in top_combinations %}
+                    <tr>
+                        <td>{{ combo.antecedents | join(', ') }}</td>
+                        <td>{{ combo.consequents | join(', ') }}</td>
+                        <td>{{ combo.support }}</td>
+                        <td>{{ combo.confidence }}</td>
+                        <td>{{ combo.lift }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Rule explorer panel -->
+        <section class="card" id="rules-card">
+            <h2>Rule Explorer</h2>
+            <p class="hint">Search the mined rules, filter by confidence and lift, and watch them live on the scatter plot.</p>
+
+            <div class="explorer-filters">
+                <input type="text" id="rule-search" class="search-input"
+                       placeholder="Filter by product..." autocomplete="off">
+                <label>Min confidence
+                    <input type="number" id="rule-min-conf" min="0" max="1" step="0.05" value="0">
+                </label>
+                <label>Min lift
+                    <input type="number" id="rule-min-lift" min="0" step="0.1" value="0">
+                </label>
+                <label>Sort by
+                    <select id="rule-sort">
+                        <option value="lift">Lift</option>
+                        <option value="confidence">Confidence</option>
+                        <option value="support">Support</option>
+                    </select>
+                </label>
+                <button id="rule-apply" class="btn btn-primary">Apply</button>
+            </div>
+
+            <div class="explorer-grid">
+                <div id="rule-scatter" class="scatter"></div>
+                <table class="combinations-table rules-table">
+                    <thead>
+                        <tr>
+                            <th>If customer buys</th>
+                            <th>Then also buys</th>
+                            <th>Conf.</th>
+                            <th>Lift</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rules-tbody">
+                        <tr><td colspan="4" class="empty-cell">Loading rules...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p id="rules-count" class="hint"></p>
+        </section>
+
+        <!-- Plot gallery -->
+        <section class="card" id="plots-card">
+            <h2>Exploratory Analysis</h2>
+            <div class="plot-gallery">
+                <figure>
+                    <img src="/plots/top_items.png" alt="Top items">
+                    <figcaption>Top 20 most purchased products</figcaption>
+                </figure>
+                <figure>
+                    <img src="/plots/basket_size_distribution.png" alt="Basket size">
+                    <figcaption>Basket size distribution</figcaption>
+                </figure>
+                <figure>
+                    <img src="/plots/item_frequency.png" alt="Item frequency">
+                    <figcaption>Item frequency distribution</figcaption>
+                </figure>
+                <figure>
+                    <img src="/plots/association_rules.png" alt="Association rules">
+                    <figcaption>Top association rules (support vs confidence)</figcaption>
+                </figure>
+                <figure>
+                    <img src="/plots/product_clusters.png" alt="Product segments">
+                    <figcaption>Product segments (K-means on co-occurrence)</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Built with Flask, Pandas, mlxtend and the Market Basket Optimisation dataset.</p>
+        </footer>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
